@@ -1,0 +1,16 @@
+---
+
+- name: Install systemd unit
+  become: True
+  template:
+    src: taskmanager.service.j2
+    dest: /etc/systemd/system/taskmanager.service
+    mode: 0644
+
+- name: Launch Flink TaskManager
+  become: True
+  systemd:
+    name: taskmanager
+    state: started
+    daemon_reload: True
+    enabled: '{{ flink_enable_services }}'

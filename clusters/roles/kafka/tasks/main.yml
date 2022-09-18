@@ -1,0 +1,38 @@
+---
+
+- name: Create directory
+  become: True
+  file:
+    path: '{{ kafka_dir }}'
+    state: directory
+  register: kafka_directory
+
+- name: Download and extract
+  become: True
+  unarchive:
+    src: http://apache.forthnet.gr/kafka/2.0.0/kafka_{{ kafka_version }}.tgz
+    dest: '{{ kafka_dir }}'
+    remote_src: True
+    owner: '{{ remote_user }}'
+    group: '{{ remote_user }}'
+    extra_opts: [--strip-components=1] # remove the top level directory
+  when: kafka_directory.changed
+
+- name: Create logs directory
+  file:
+    path: '{{ kafka_dir }}/logs'
+    state: directory
+
+- name: Save gathered facts (to get the IP of kafka network interface later)
+  setup:
+  register: allfacts
+
+- name: Configure
+  template:
+    src: '{{ item }}.j2'
+    dest: '{{ kafka_dir }}/config/{{ item }}'
+  with_items:
+    - server.properties
+
+- name: Start service
+  include_tasks: systemd.yml

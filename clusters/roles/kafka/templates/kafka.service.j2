@@ -1,0 +1,14 @@
+[Unit]
+Description=Kafka Service
+Documentation=https://kafka.apache.org/documentation
+Requires=network.target
+After=network.target
+
+[Service]
+Type=simple
+ExecStart={{ kafka_dir }}/bin/kafka-server-start.sh {{ kafka_dir }}/config/server.properties
+ExecStop={{ kafka_dir }}/bin/kafka-server-stop.sh
+WorkingDirectory={{ kafka_dir }}
+
+[Install]
+WantedBy=multi-user.target

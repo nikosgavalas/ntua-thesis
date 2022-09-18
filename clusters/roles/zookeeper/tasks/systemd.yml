@@ -1,0 +1,16 @@
+---
+
+- name: Install systemd unit
+  become: True
+  template:
+    src: zookeeper.service.j2
+    dest: /etc/systemd/system/zookeeper.service
+    mode: 0644
+
+- name: Launch Zookeeper
+  become: True
+  systemd:
+    name: zookeeper
+    state: started
+    daemon_reload: True
+    enabled: '{{ zookeeper_enable_services }}'

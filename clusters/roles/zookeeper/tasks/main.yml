@@ -1,0 +1,47 @@
+---
+
+- name: Create directory
+  become: True
+  file:
+    path: '{{ zookeeper_dir }}'
+    state: directory
+  register: zookeeper_directory
+
+- name: Download and extract
+  become: True
+  unarchive:
+    src: http://apache.forthnet.gr/zookeeper/stable/zookeeper-{{ zookeeper_version }}.tar.gz
+    dest: '{{ zookeeper_dir }}'
+    remote_src: True
+    owner: '{{ remote_user }}'
+    group: '{{ remote_user }}'
+    extra_opts: [--strip-components=1] # remove the top level directory
+  when: zookeeper_directory.changed
+
+- name: Create logs and data dir
+  file:
+    path: '{{ zookeeper_dir }}/{{ item }}'
+    state: directory
+  with_items:
+    - log
+    - data
+
+- name: Delete sample conf
+  file:
+    path: '{{ zookeeper_dir }}/conf/zoo_sample.cfg'
+    state: absent
+
+- name: Configure zookeeper
+  template:
+    src: '{{ item.file }}'
+    dest: '{{ item.dest }}'
+  with_items:
+    - file: zoo.cfg.j2
+      dest: '{{ zookeeper_dir }}/conf/zoo.cfg'
+    - file: log4j.properties.j2
+      dest: '{{ zookeeper_dir }}/conf/log4j.properties'
+    - file: myid.j2
+      dest: '{{ zookeeper_dir }}/data/myid'
+
+- name: Configure systemd
+  include_tasks: systemd.yml

@@ -1,0 +1,42 @@
+---
+
+- name: Install Java 1.8
+  apt: name=openjdk-8-jdk state=present
+  become: True
+
+- name: Create directory for files
+  file:
+    path: '{{ files_dir }}'
+    state: directory
+  become: True
+
+- name: Copy necessary files over
+  copy:
+    src: '{{ item }}'
+    dest: '{{ files_dir }}'
+    owner: '{{ remote_user }}'
+    group: '{{ remote_user }}'
+    mode: 644
+  with_fileglob:
+    - /srv/thesis/*
+  become: True
+
+- name: Make the thesis folder readable
+  file:
+    path: /srv/thesis
+    mode: u=rwX,g=rX,o=rX
+    recurse: yes
+
+# - name: Download FullKDD
+#   get_url:
+#     url: http://kdd.ics.uci.edu/databases/kddcup99/kddcup.data.gz
+#     dest: /srv/thesis/kddfull.gz
+#     mode: 0644
+#   become: True
+
+# - name: Download 10% KDD
+#   get_url:
+#     url: http://kdd.ics.uci.edu/databases/kddcup99/kddcup.data_10_percent.gz
+#     dest: /srv/thesis/kdd10.gz
+#     mode: 0644
+#   become: True

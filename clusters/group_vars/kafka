@@ -1,0 +1,10 @@
+---
+
+kafka_enable_services: True
+
+kafka_version: 2.11-2.0.0
+kafka_dir: /srv/kafka
+
+kafka_port: 9092
+
+kafka_network_iface: ens3

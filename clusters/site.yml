@@ -1,0 +1,26 @@
+---
+# main playbook, run with `ansible-playbook -i hosts site.yml`
+
+- name: Apply common configuration to all nodes
+  hosts: all
+  remote_user: '{{ remote_user }}'
+  roles:
+    - common
+
+# - name: Configure and start zookeeper cluster
+#   hosts: zookeepers
+#   remote_user: '{{ remote_user }}'
+#   roles:
+#     - zookeeper
+
+- name: Configure and deploy the flink cluster
+  hosts: flink
+  remote_user: '{{ remote_user }}'
+  roles:
+    - flink
+
+# - name: Configure and deploy the kafka cluster
+#   hosts: kafka
+#   remote_user: '{{ remote_user }}'
+#   roles:
+#     - kafka
